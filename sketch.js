@@ -5,64 +5,58 @@ function setup() {
 function draw() {
   background(220);
 }
-let particles = [];
+let isTapping = false;
+let tapTimer = 0;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  background(10);
-  noStroke();
+  createCanvas(400, 400);
 }
 
 function draw() {
-  // This creates the "trailing" effect - lower alpha (10) means longer trails
-  background(10, 10); 
+  background("#A7D8DE"); // Soft blue background
   
-  // Add new particles when mouse moves
-  if (mouseX !== pmouseX && mouseY !== pmouseY) {
-    for (let i = 0; i < 3; i++) {
-      particles.push(new Particle(mouseX, mouseY));
-    }
+  // 1. Draw Keyboard
+  fill(50);
+  rect(100, 250, 200, 60, 5); // Keyboard base
+  fill(255);
+  for(let i=0; i<8; i++) {
+    rect(110 + i*22, 260, 18, 40, 2); // Simple keys
   }
 
-  // Update and show particles
-  for (let i = particles.length - 1; i >= 0; i--) {
-    particles[i].update();
-    particles[i].show();
-    if (particles[i].finished()) {
-      particles.splice(i, 1);
-    }
+  // 2. Draw Mambo (Head & Body)
+  fill("#FFF9C4"); // Light yellow
+  ellipse(200, 200, 150, 130); // Head
+  
+  // Ears
+  ellipse(140, 150, 40, 40);
+  ellipse(260, 150, 40, 40);
+  
+  // Face
+  fill(50);
+  ellipse(175, 200, 10, 10); // Left eye
+  ellipse(225, 200, 10, 10); // Right eye
+  noFill();
+  stroke(50);
+  strokeWeight(2);
+  arc(200, 215, 20, 15, 0, PI); // Smile
+  noStroke();
+
+  // 3. Hands Logic
+  let handY = 250;
+  if (isTapping) {
+    handY = 270; // Move hands down when key is pressed
+    tapTimer--;
+    if (tapTimer <= 0) isTapping = false;
   }
+
+  fill("#FFF9C4");
+  ellipse(150, handY, 40, 30); // Left hand
+  ellipse(250, handY, 40, 30); // Right hand
 }
 
-class Particle {
-  constructor(x, y) {
-    this.x = x;
-    this.y = y;
-    this.vx = random(-1, 1);
-    this.vy = random(-1, 1);
-    this.alpha = 255;
-    // Cool neon color palette
-    let colors = ['#ff0055', '#00ffcc', '#ffcc00', '#9900ff', '#ffffff'];
-    this.color = color(random(colors));
-  }
-
-  finished() {
-    return this.alpha < 0;
-  }
-
-  update() {
-    this.x += this.vx;
-    this.y += this.vy;
-    this.alpha -= 2; // Speed of fading
-  }
-
-  show() {
-    fill(this.color.levels[0], this.color.levels[1], this.color.levels[2], this.alpha);
-    ellipse(this.x, this.y, random(5, 15));
-  }
-}
-
-function mousePressed() {
-  background(10); // Click to clear the canvas
+// Trigger "pressing" when any button is hit
+function keyPressed() {
+  isTapping = true;
+  tapTimer = 5; // How many frames the "tap" lasts
 }
 
